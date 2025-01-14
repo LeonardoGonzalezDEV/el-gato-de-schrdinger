@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lector QR</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <style>
+     body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212; /* Fondo oscuro */
+      color: white; /* Texto blanco */
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e; /* Fondo gris oscuro */
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white; /* Texto blanco */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a; /* Fondo oscuro */
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Verde para el progreso */
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white; /* Texto blanco */
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a; /* Fondo gris oscuro */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white; /* Texto blanco */
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838; /* Fondo gris al pasar el cursor */
+    }
+    .scanner-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    #reader {
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .camera-controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    .btn-primary {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #45a049;
+    }
+    .btn-secondary {
+      background-color: #666;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background-color: #555;
+    }
+    .btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .result-section {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      display: none;
+    }
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .result-type {
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    .result-content {
+      word-break: break-all;
+      margin: 1rem 0;
+    }
+    .result-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    .camera-select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      width: 100%;
+      max-width: 300px;
+    }
+    #flash-toggle {
+      display: none;
+    }
+    .scan-region-highlight {
+      border: 2px solid #4CAF50 !important;
+    }
+    .scan-region-highlight-svg {
+      stroke: #4CAF50 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+    </h1> 
+    <div class="menu">
+      <div class="menu-item">
+        <a href="#">Audio</a>
+        <div class="submenu">
+          <a href="conversionAudio.html">Conversión</a>
+          <a href="compressionAudio.html">Compresión</a>
+          <a href="TextoToAudio.html">Texto a Audio</a>
+          <a href="RecortarAudio.html">Recortar</a>
+          
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Imagen</a>
+        <div class="submenu">
+          <a href="conversionImagen.html">Conversión</a>
+          <a href="compressionImagen.html">Compresión</a>
+          <a href="resizeImagen.html">Redimensionar</a>
+          <a href="editImage.html">Editar</a>
+          <a href="Icon.html">Icono</a>
+          <a href="paleta_img.html">Detectar Colores</a>
+          <a href="quitar_fondo.html">Borrar Fondo</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Video</a>
+        <div class="submenu">
+          <a href="conversionVideo.html">Conversión</a>
+          <a href="SepararAudio.html">Separar Audio</a>
+          <a href="RecortarVideo.html">Recortar</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" class="active">Qr</a>
+        <div class="submenu">
+          <a href="GenerarQr.html">Crear</a>
+          <a href="LeerQr.html">Leer</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Archivos</a>
+        <div class="submenu">
+          <a href="pdfunion.html">Unir PDF</a>
+          <a href="pdfsepar.html">Separar PDF</a>
+          <a href="deletepdf.html">Borrar PDF</a>
+          <a href="textotoPdf.html">Texto a PDF</a>
+          <a href="excel.html">Excel/CSV</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Herramientas</a>
+        <div class="submenu">
+                <a href="speedtest.html">Test de Internet</a>
+                <a href="resumidor.html">Resumidor de Textos</a>
+                <a href="GenerarPass.html">Generar Contraseña</a>
+                <a href="VerifyPass.html">Verificar Contraseña</a>
+                <a href="clicktest.html">Test de Mouse</a>
+                <a href="Testeclado.html">Test de Teclado</a>
+                <a href="divisas.html">Divisas</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#" >Aleatorio</a>
+        <div class="submenu">
+                <a href="cara_cruz.html">Cara Cruz</a>
+                <a href="ruleta.html">Ruleta</a>
+                <a href="dado.html">Dado</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#">Biblioteca</a>
+        <div class="submenu">
+                <a href="wiki.html">Wikipedia</a>
+                <a href="github.html">Github</a>
+                <a href="reddit.html">Reddit</a>
+            </div>
+      </div>
+    </div>
+    
+    <select class="camera-select" id="camera-select">
+      <option value="">Seleccionar Cámara</option>
+    </select>
+    
+    <div class="scanner-container">
+      <div id="reader"></div>
+    </div>
+    
+    <div class="camera-controls">
+      <button class="btn btn-primary" id="start-button">Iniciar Escáner</button>
+      <button class="btn btn-secondary" id="stop-button" disabled>Detener Escáner</button>
+      <button class="btn btn-secondary" id="flash-toggle">Activar Flash</button>
+    </div>
+    
+    <div class="result-section" id="result-section">
+      <div class="result-header">
+        <span class="result-type" id="result-type">Texto</span>
+        <button class="btn btn-secondary" id="clear-result">Limpiar</button>
+      </div>
+      <div class="result-content" id="result-content"></div>
+      <div class="result-actions">
+        <button class="btn btn-primary" id="copy-result">Copiar al Portapapeles</button>
+        <button class="btn btn-secondary" id="open-result">Abrir Enlace</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cameraSelect = document.getElementById('camera-select');
+    const startButton = document.getElementById('start-button');
+    const stopButton = document.getElementById('stop-button');
+    const flashToggle = document.getElementById('flash-toggle');
+    const resultSection = document.getElementById('result-section');
+    const resultType = document.getElementById('result-type');
+    const resultContent = document.getElementById('result-content');
+    const clearResult = document.getElementById('clear-result');
+    const copyResult = document.getElementById('copy-result');
+    const openResult = document.getElementById('open-result');
+
+    let html5QrcodeScanner = null;
+
+    // Get available cameras
+    async function getCameras() {
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        devices.forEach(device => {
+          const option = document.createElement('option');
+          option.value = device.id;
+          option.text = device.label;
+          cameraSelect.add(option);
+        });
+      } catch (err) {
+        console.error('Error getting cameras:', err);
+        alert('Error al acceder a las cámaras. Asegúrate de haber otorgado permisos a las cámaras.');
+      }
+    }
+
+    // Initialize QR Scanner
+    function initializeScanner(cameraId) {
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0
+      };
+
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      
+      html5QrcodeScanner.start(
+        cameraId,
+        config,
+        onScanSuccess,
+        onScanError
+      )
+      .then(() => {
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        
+        // Check if torch is available
+        html5QrcodeScanner.getTorchState()
+          .then(state => {
+            flashToggle.style.display = 'block';
+          })
+          .catch(() => {
+            flashToggle.style.display = 'none';
+          });
+      })
+      .catch(err => {
+        console.error('Error al iniciar el escáner:', err);
+        alert('Error al iniciar el escáner. Inténtalo de nuevo.');
+      });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      // Determine content type
+      let type = 'Text';
+      if (decodedText.startsWith('http')) {
+        type = 'URL';
+      } else if (decodedText.startsWith('tel:')) {
+        type = 'Phone Number';
+        decodedText = decodedText.replace('tel:', '');
+      }
+
+      // Display result
+      resultType.textContent = type;
+      resultContent.textContent = decodedText;
+      resultSection.style.display = 'block';
+
+      // Show/hide open link button
+      openResult.style.display = type === 'URL' ? 'block' : 'none';
+    }
+
+    function onScanError(error) {
+      // Handle scan errors if needed
+      console.warn(`QR error: ${error}`);
+    }
+
+    // Event Listeners
+    startButton.addEventListener('click', () => {
+      const selectedCamera = cameraSelect.value;
+      if (!selectedCamera) {
+        alert('Por favor seleccione una cámara primero');
+        return;
+      }
+      initializeScanner(selectedCamera);
+    });
+
+    stopButton.addEventListener('click', () => {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop()
+          .then(() => {
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            flashToggle.style.display = 'none';
+          })
+          .catch(err => console.error('Error al detener el escáner:', err));
+      }
+    });
+
+    flashToggle.addEventListener('click', () => {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.getTorchState()
+          .then(state => {
+            return html5QrcodeScanner.toggleTorch();
+          })
+          .then(() => {
+            flashToggle.textContent = flashToggle.textContent.includes('On') 
+              ? 'Toggle Flash Off' 
+              : 'Toggle Flash On';
+          })
+          .catch(err => console.error('Error al alternar el flash:', err));
+      }
+    });
+
+    clearResult.addEventListener('click', () => {
+      resultSection.style.display = 'none';
+      resultContent.textContent = '';
+    });
+
+    copyResult.addEventListener('click', () => {
+      navigator.clipboard.writeText(resultContent.textContent)
+        .then(() => alert('Contenido copiado al portapapeles!'))
+        .catch(err => console.error('Error al copiar al portapapeles:', err));
+    });
+
+    openResult.addEventListener('click', () => {
+      const content = resultContent.textContent;
+      if (content.startsWith('http')) {
+        window.open(content, '_blank');
+      }
+    });
+
+    // Initialize camera list
+    getCameras();
+  </script>
+</body>
+</html>

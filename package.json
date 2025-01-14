@@ -1,0 +1,49 @@
+{
+  "name": "el-gato-de-schrodinger",
+  "version": "1.1.0",
+  "description": "El Gato de Schrödinger: Una completa colección de herramientas de imagen, sonido, video, archivos y utilidades en un solo lugar.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "herramientas",
+    "compresión",
+    "conversión",
+    "edición",
+    "PDF",
+    "QR",
+    "imagen",
+    "audio",
+    "video",
+    "test de internet",
+    "test de teclado",
+    "test de mouse",
+    "generador de contraseñas"
+  ],
+  "author": "Leonardo Rodrigo Avalos Gonzalez",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.3.1",
+    "electron-builder": "^24.6.0"
+  },
+  "build": {
+    "appId": "com.schrodinger.gato",
+    "productName": "El Gato de Schrödinger",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "assets/license.txt",
+      "perMachine": false,
+      "installerIcon": "assets/icon2.ico",
+      "uninstallerIcon": "assets/icon2.ico",
+      "installerHeaderIcon": "assets/icon2.ico"
+    }
+  }
+}

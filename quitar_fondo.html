@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remover Fondo de Imagen</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212; 
+      color: white;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white; /* Texto blanco */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a; /* Fondo oscuro */
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Verde para el progreso */
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white; /* Texto blanco */
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a; /* Fondo gris oscuro */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white; /* Texto blanco */
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838; /* Fondo gris al pasar el cursor */
+    }
+    #canvas {
+      max-width: 100%;
+      border: 2px dashed #4caf50;
+      margin: 20px 0;
+      background-color: #2a2a2a;
+    }
+    #imageInput {
+      display: block;
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background-color: #444444;
+      color: #ffffff;
+      border: 2px solid #555555;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .button-container {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    #removeBackgroundBtn, #downloadBtn {
+      flex: 1;
+      padding: 1rem;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #removeBackgroundBtn:hover, #downloadBtn:hover {
+      background-color: #45a049;
+    }
+    #downloadBtn {
+      display: none;
+      background-color: #2196F3;
+    }
+    #downloadBtn:hover {
+      background-color: #1976D2;
+    }
+    #backgroundColorInfo {
+      text-align: center;
+      color: #ccc;
+      margin-top: 1rem;
+    }
+    input[type="file"] {
+    display: block;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    background-color: #444444;
+    color: #ffffff;
+    border: 2px solid #555555;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  input[type="file"]::-webkit-file-upload-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #45a049;
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+    </h1> 
+    <div class="menu">
+      <div class="menu-item">
+        <a href="#">Audio</a>
+        <div class="submenu">
+          <a href="conversionAudio.html">Conversión</a>
+          <a href="compressionAudio.html">Compresión</a>
+          <a href="TextoToAudio.html">Texto a Audio</a>
+          <a href="RecortarAudio.html">Recortar</a>
+          
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" class="active">Imagen</a>
+        <div class="submenu">
+          <a href="conversionImagen.html">Conversión</a>
+          <a href="compressionImagen.html">Compresión</a>
+          <a href="resizeImagen.html">Redimensionar</a>
+          <a href="editImage.html">Editar</a>
+          <a href="Icon.html">Icono</a>
+          <a href="paleta_img.html">Detectar Colores</a>
+          <a href="quitar_fondo.html">Borrar Fondo</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Video</a>
+        <div class="submenu">
+          <a href="conversionVideo.html">Conversión</a>
+          <a href="SepararAudio.html">Separar Audio</a>
+          <a href="RecortarVideo.html">Recortar</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#">Qr</a>
+        <div class="submenu">
+          <a href="GenerarQr.html">Crear</a>
+          <a href="LeerQr.html">Leer</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Archivos</a>
+        <div class="submenu">
+          <a href="pdfunion.html">Unir PDF</a>
+          <a href="pdfsepar.html">Separar PDF</a>
+          <a href="deletepdf.html">Borrar PDF</a>
+          <a href="textotoPdf.html">Texto a PDF</a>
+          <a href="excel.html">Excel/CSV</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Herramientas</a>
+        <div class="submenu">
+                <a href="speedtest.html">Test de Internet</a>
+                <a href="resumidor.html">Resumidor de Textos</a>
+                <a href="GenerarPass.html">Generar Contraseña</a>
+                <a href="VerifyPass.html">Verificar Contraseña</a>
+                <a href="clicktest.html">Test de Mouse</a>
+                <a href="Testeclado.html">Test de Teclado</a>
+                <a href="divisas.html">Divisas</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#" >Aleatorio</a>
+        <div class="submenu">
+                <a href="cara_cruz.html">Cara Cruz</a>
+                <a href="ruleta.html">Ruleta</a>
+                <a href="dado.html">Dado</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#">Biblioteca</a>
+        <div class="submenu">
+                <a href="wiki.html">Wikipedia</a>
+                <a href="github.html">Github</a>
+                <a href="reddit.html">Reddit</a>
+            </div>
+      </div>
+    </div>
+    <h2>Archivo de Imagen</h2>
+    <span> (Recomendacion usar imagenes con fondo solido)</span>
+    <input type="file" id="imageInput" accept="image/*">
+    
+    <canvas id="canvas"></canvas>
+    
+    <div id="backgroundColorInfo"></div>
+    
+    <div class="button-container">
+      <button id="removeBackgroundBtn" disabled>Remover Fondo</button>
+      <button id="downloadBtn">Descargar</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const imageInput = document.getElementById('imageInput');
+    const removeBackgroundBtn = document.getElementById('removeBackgroundBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const backgroundColorInfo = document.getElementById('backgroundColorInfo');
+    let originalImage = null;
+
+    imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        originalImage = new Image();
+        originalImage.onload = function() {
+          canvas.width = originalImage.width;
+          canvas.height = originalImage.height;
+          ctx.drawImage(originalImage, 0, 0);
+          removeBackgroundBtn.disabled = false;
+        }
+        originalImage.src = event.target.result;
+      }
+
+      reader.readAsDataURL(file);
+    });
+
+    function findMostCommonColor(imageData) {
+      const colorCount = {};
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        // Ignorar píxeles completamente transparentes
+        if (data[i + 3] === 0) continue;
+
+        const color = `${data[i]},${data[i+1]},${data[i+2]}`;
+        colorCount[color] = (colorCount[color] || 0) + 1;
+      }
+
+      let mostCommonColor = null;
+      let maxCount = 0;
+      for (const color in colorCount) {
+        if (colorCount[color] > maxCount) {
+          mostCommonColor = color;
+          maxCount = colorCount[color];
+        }
+      }
+
+      return mostCommonColor ? mostCommonColor.split(',').map(Number) : null;
+    }
+
+    removeBackgroundBtn.addEventListener('click', function() {
+      if (!originalImage) {
+        alert('Por favor, selecciona una imagen primero');
+        return;
+      }
+
+      canvas.width = originalImage.width;
+      canvas.height = originalImage.height;
+      ctx.drawImage(originalImage, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      const backgroundColor = findMostCommonColor(imageData);
+
+      if (backgroundColor) {
+        backgroundColorInfo.innerHTML = `Color de fondo detectado: RGB(${backgroundColor.join(', ')})`;
+
+        const tolerance = 30; 
+        for (let i = 0; i < data.length; i += 4) {
+          if (Math.abs(data[i] - backgroundColor[0]) <= tolerance &&
+              Math.abs(data[i + 1] - backgroundColor[1]) <= tolerance &&
+              Math.abs(data[i + 2] - backgroundColor[2]) <= tolerance) {
+            data[i + 3] = 0; 
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      downloadBtn.style.display = 'block';
+    });
+
+    downloadBtn.addEventListener('click', function() {
+      const link = document.createElement('a');
+      link.download = 'imagen-sin-fondo.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script>
+</body>
+</html>

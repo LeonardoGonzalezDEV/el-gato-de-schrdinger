@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Probador de Teclado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      color: white;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white; /* Texto blanco */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a; /* Fondo oscuro */
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Verde para el progreso */
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white; /* Texto blanco */
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a; /* Fondo gris oscuro */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white; /* Texto blanco */
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838; /* Fondo gris al pasar el cursor */
+    }
+    .keyboard {
+      display: grid;
+      grid-gap: 8px;
+      padding: 20px;
+      background-color: #2a2a2a;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      max-width: 1250px;
+      margin: 0 auto;
+    }
+    .key {
+      background-color: #333;
+      border: 2px solid #444;
+      border-radius: 5px;
+      padding: 15px;
+      text-align: center;
+      min-width: 40px;
+      position: relative;
+      cursor: default;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+    .key.pressed {
+      background-color: #4caf50;
+      border-color: #45a049;
+      transform: scale(0.95);
+    }
+    .key .shift-char {
+      font-size: 12px;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      opacity: 0.7;
+    }
+    .key .main-char {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .key-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .spacebar {
+      width: 350px !important;
+    }
+    .key.wide-2 {
+      width: 80px;
+    }
+    .key.wide-3 {
+      width: 120px;
+    }
+    .instructions {
+      text-align: center;
+      margin: 20px 0;
+      padding: 20px;
+      background-color: #2a2a2a;
+      border-radius: 8px;
+    }
+    .status {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    .reset-btn {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      padding: 1rem;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease;
+    }
+    .reset-btn:hover {
+      background-color: #45a049;
+    }
+    .progress {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a;
+      border-radius: 10px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+    </h1> 
+    <div class="menu">
+      <div class="menu-item">
+        <a href="#">Audio</a>
+        <div class="submenu">
+          <a href="conversionAudio.html">Conversión</a>
+          <a href="compressionAudio.html">Compresión</a>
+          <a href="TextoToAudio.html">Texto a Audio</a>
+          <a href="RecortarAudio.html">Recortar</a>
+          
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Imagen</a>
+        <div class="submenu">
+          <a href="conversionImagen.html">Conversión</a>
+          <a href="compressionImagen.html">Compresión</a>
+          <a href="resizeImagen.html">Redimensionar</a>
+          <a href="editImage.html">Editar</a>
+          <a href="Icon.html">Icono</a>
+          <a href="paleta_img.html">Detectar Colores</a>
+          <a href="quitar_fondo.html">Borrar Fondo</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Video</a>
+        <div class="submenu">
+          <a href="conversionVideo.html">Conversión</a>
+          <a href="SepararAudio.html">Separar Audio</a>
+          <a href="RecortarVideo.html">Recortar</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#">Qr</a>
+        <div class="submenu">
+          <a href="GenerarQr.html">Crear</a>
+          <a href="LeerQr.html">Leer</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Archivos</a>
+        <div class="submenu">
+          <a href="pdfunion.html">Unir PDF</a>
+          <a href="pdfsepar.html">Separar PDF</a>
+          <a href="deletepdf.html">Borrar PDF</a>
+          <a href="textotoPdf.html">Texto a PDF</a>
+          <a href="excel.html">Excel/CSV</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" class="active">Herramientas</a>
+        <div class="submenu">
+                <a href="speedtest.html">Test de Internet</a>
+                <a href="resumidor.html">Resumidor de Textos</a>
+                <a href="GenerarPass.html">Generar Contraseña</a>
+                <a href="VerifyPass.html">Verificar Contraseña</a>
+                <a href="clicktest.html">Test de Mouse</a>
+                <a href="Testeclado.html">Test de Teclado</a>
+                <a href="divisas.html">Divisas</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#" >Aleatorio</a>
+        <div class="submenu">
+                <a href="cara_cruz.html">Cara Cruz</a>
+                <a href="ruleta.html">Ruleta</a>
+                <a href="dado.html">Dado</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#">Biblioteca</a>
+        <div class="submenu">
+                <a href="wiki.html">Wikipedia</a>
+                <a href="github.html">Github</a>
+                <a href="reddit.html">Reddit</a>
+            </div>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <p>Presiona cada tecla de tu teclado para probar su funcionamiento. Las teclas presionadas se iluminarán en verde.</p>
+    </div>
+
+    <div class="progress">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="status" id="status">
+      Teclas probadas: 0 de 0
+    </div>
+
+    <div class="keyboard" id="keyboard">
+      <!-- Las teclas se generarán dinámicamente con JavaScript -->
+    </div>
+
+    <button class="reset-btn" id="reset-btn">Reiniciar Prueba</button>
+  </div>
+
+  <script>
+    const keyboard = {
+      row1: [
+        { main: 'Esc', code: 'Escape' },
+        { main: 'F1', code: 'F1' },
+        { main: 'F2', code: 'F2' },
+        { main: 'F3', code: 'F3' },
+        { main: 'F4', code: 'F4' },
+        { main: 'F5', code: 'F5' },
+        { main: 'F6', code: 'F6' },
+        { main: 'F7', code: 'F7' },
+        { main: 'F8', code: 'F8' },
+        { main: 'F9', code: 'F9' },
+        { main: 'F10', code: 'F10' },
+        { main: 'F11', code: 'F11' },
+        { main: 'F12', code: 'F12' }
+      ],
+      row2: [
+        { main: '1', shift: '!', code: 'Digit1' },
+        { main: '2', shift: '"', code: 'Digit2' },
+        { main: '3', shift: '#', code: 'Digit3' },
+        { main: '4', shift: '$', code: 'Digit4' },
+        { main: '5', shift: '%', code: 'Digit5' },
+        { main: '6', shift: '&', code: 'Digit6' },
+        { main: '7', shift: '/', code: 'Digit7' },
+        { main: '8', shift: '(', code: 'Digit8' },
+        { main: '9', shift: ')', code: 'Digit9' },
+        { main: '0', shift: '=', code: 'Digit0' },
+        { main: "'", shift: '?', code: 'Minus' },
+        { main: '¿', shift: '¡', code: 'Equal' },
+        { main: 'Backspace', code: 'Backspace', wide: true }
+      ],
+      row3: [
+        { main: 'Tab', code: 'Tab', wide: true },
+        { main: 'Q', code: 'KeyQ' },
+        { main: 'W', code: 'KeyW' },
+        { main: 'E', code: 'KeyE' },
+        { main: 'R', code: 'KeyR' },
+        { main: 'T', code: 'KeyT' },
+        { main: 'Y', code: 'KeyY' },
+        { main: 'U', code: 'KeyU' },
+        { main: 'I', code: 'KeyI' },
+        { main: 'O', code: 'KeyO' },
+        { main: 'P', code: 'KeyP' },
+        { main: '´', shift: '¨', code: 'BracketLeft' },
+        { main: '+', shift: '*', code: 'BracketRight' },
+        { main: 'Enter', code: 'Enter', wide: true }
+      ],
+      row4: [
+        { main: 'Bloq Mayús', code: 'CapsLock', wide: true },
+        { main: 'A', code: 'KeyA' },
+        { main: 'S', code: 'KeyS' },
+        { main: 'D', code: 'KeyD' },
+        { main: 'F', code: 'KeyF' },
+        { main: 'G', code: 'KeyG' },
+        { main: 'H', code: 'KeyH' },
+        { main: 'J', code: 'KeyJ' },
+        { main: 'K', code: 'KeyK' },
+        { main: 'L', code: 'KeyL' },
+        { main: 'Ñ', code: 'Semicolon' },
+        { main: '{', shift: '[', code: 'Quote' },
+        { main: '}', shift: ']', code: 'Backslash' }
+      ],
+      row5: [
+        { main: 'Shift', code: 'ShiftLeft', wide: true },
+        { main: '<', shift: '>', code: 'IntlBackslash' },
+        { main: 'Z', code: 'KeyZ' },
+        { main: 'X', code: 'KeyX' },
+        { main: 'C', code: 'KeyC' },
+        { main: 'V', code: 'KeyV' },
+        { main: 'B', code: 'KeyB' },
+        { main: 'N', code: 'KeyN' },
+        { main: 'M', code: 'KeyM' },
+        { main: ',', shift: ';', code: 'Comma' },
+        { main: '.', shift: ':', code: 'Period' },
+        { main: '-', shift: '_', code: 'Slash' },
+        { main: 'Shift', code: 'ShiftRight', wide: true }
+      ],
+      row6: [
+        { main: 'Ctrl', code: 'ControlLeft', wide: true },
+        { main: 'Win', code: 'MetaLeft', wide: true },
+        { main: 'Alt', code: 'AltLeft', wide: true },
+        { main: 'Space', code: 'Space', extraWide: true },
+        { main: 'Alt Gr', code: 'AltRight', wide: true },
+        { main: 'Ctrl', code: 'ControlRight', wide: true }
+      ]
+    };
+
+    let pressedKeys = new Set();
+    let totalKeys = 0;
+
+    function createKeyboard() {
+      const keyboardElement = document.getElementById('keyboard');
+      Object.values(keyboard).forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'key-row';
+        
+        row.forEach(key => {
+          const keyDiv = document.createElement('div');
+          keyDiv.className = 'key';
+          if (key.wide) keyDiv.classList.add('wide-2');
+          if (key.extraWide) keyDiv.classList.add('spacebar');
+          keyDiv.dataset.code = key.code;
+
+          if (key.shift) {
+            const shiftChar = document.createElement('span');
+            shiftChar.className = 'shift-char';
+            shiftChar.textContent = key.shift;
+            keyDiv.appendChild(shiftChar);
+          }
+
+          const mainChar = document.createElement('span');
+          mainChar.className = 'main-char';
+          mainChar.textContent = key.main;
+          keyDiv.appendChild(mainChar);
+          
+          rowDiv.appendChild(keyDiv);
+          totalKeys++;
+        });
+        
+        keyboardElement.appendChild(rowDiv);
+      });
+      
+      updateStatus();
+    }
+
+    function updateStatus() {
+      const progress = (pressedKeys.size / totalKeys) * 100;
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+      document.getElementById('status').textContent = 
+        `Teclas probadas: ${pressedKeys.size} de ${totalKeys}`;
+    }
+
+    function resetTest() {
+      pressedKeys.clear();
+      document.querySelectorAll('.key').forEach(key => {
+        key.classList.remove('pressed');
+      });
+      updateStatus();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      createKeyboard();
+      
+      document.addEventListener('keydown', (e) => {
+        e.preventDefault();
+        const keyElements = document.querySelectorAll(`[data-code="${e.code}"]`);
+        
+        keyElements.forEach(keyElement => {
+          if (keyElement) {
+            keyElement.classList.add('pressed');
+            pressedKeys.add(e.code);
+            updateStatus();
+          }
+        });
+      });
+
+      document.getElementById('reset-btn').addEventListener('click', resetTest);
+    });
+  </script>
+</body>
+</html>

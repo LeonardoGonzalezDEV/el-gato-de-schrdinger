@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unir PDFs</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212; /* Fondo oscuro */
+      color: white; /* Texto blanco */
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e; /* Fondo gris oscuro */
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white; /* Texto blanco */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a; /* Fondo oscuro */
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Verde para el progreso */
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white; /* Texto blanco */
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a; /* Fondo gris oscuro */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white; /* Texto blanco */
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838; /* Fondo gris al pasar el cursor */
+    }
+    .drop-zone {
+      border: 2px dashed #4CAF50;
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .drop-zone:hover {
+      background-color: #2a2a2a;
+    }
+    .drop-zone.dragover {
+      background-color: #2a2a2a;
+      border-color: #2e7d32;
+    }
+    .drop-zone p {
+      margin: 0;
+      color: #ffffff;
+    }
+    .file-input {
+      display: none;
+    }
+    .pdf-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .pdf-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background-color: #2a2a2a;
+      border-radius: 5px;
+      margin-bottom: 0.5rem;
+      cursor: move;
+    }
+    .pdf-item:hover {
+      background-color: #2a2a2a;
+    }
+    .pdf-info {
+      flex-grow: 1;
+      margin-left: 1rem;
+    }
+    .pdf-name {
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+    .pdf-size {
+      font-size: 0.875rem;
+      color: #ffffff;
+    }
+    .pdf-preview {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #2a2a2a;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .pdf-preview img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .remove-pdf {
+      padding: 0.5rem;
+      background: none;
+      border: none;
+      color: #f44336;
+      cursor: pointer;
+      font-size: 1.25rem;
+      margin-left: 1rem;
+    }
+    .remove-pdf:hover {
+      color: #d32f2f;
+    }
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    .btn-primary {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #45a049;
+    }
+    .btn-secondary {
+      background-color: #666;
+      color: white;
+      margin-left: 1rem;
+    }
+    .btn-secondary:hover {
+      background-color: #555;
+    }
+    .btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 4px;
+      display: none;
+    }
+    .status.success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+    .status.error {
+      background-color: #fde9e8;
+      color: #c62828;
+      display: block;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background-color: #f0f0f0;
+      border-radius: 2px;
+      margin-top: 1rem;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background-color: #4CAF50;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+    </h1> 
+    <div class="menu">
+      <div class="menu-item">
+        <a href="#">Audio</a>
+        <div class="submenu">
+          <a href="conversionAudio.html">Conversión</a>
+          <a href="compressionAudio.html">Compresión</a>
+          <a href="TextoToAudio.html">Texto a Audio</a>
+          <a href="RecortarAudio.html">Recortar</a>
+          
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Imagen</a>
+        <div class="submenu">
+          <a href="conversionImagen.html">Conversión</a>
+          <a href="compressionImagen.html">Compresión</a>
+          <a href="resizeImagen.html">Redimensionar</a>
+          <a href="editImage.html">Editar</a>
+          <a href="Icon.html">Icono</a>
+          <a href="paleta_img.html">Detectar Colores</a>
+          <a href="quitar_fondo.html">Borrar Fondo</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Video</a>
+        <div class="submenu">
+          <a href="conversionVideo.html">Conversión</a>
+          <a href="SepararAudio.html">Separar Audio</a>
+          <a href="RecortarVideo.html">Recortar</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#">Qr</a>
+        <div class="submenu">
+          <a href="GenerarQr.html">Crear</a>
+          <a href="LeerQr.html">Leer</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" class="active">Archivos</a>
+        <div class="submenu">
+          <a href="pdfunion.html">Unir PDF</a>
+          <a href="pdfsepar.html">Separar PDF</a>
+          <a href="deletepdf.html">Borrar PDF</a>
+          <a href="textotoPdf.html">Texto a PDF</a>
+          <a href="excel.html">Excel/CSV</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Herramientas</a>
+        <div class="submenu">
+                <a href="speedtest.html">Test de Internet</a>
+                <a href="resumidor.html">Resumidor de Textos</a>
+                <a href="GenerarPass.html">Generar Contraseña</a>
+                <a href="VerifyPass.html">Verificar Contraseña</a>
+                <a href="clicktest.html">Test de Mouse</a>
+                <a href="Testeclado.html">Test de Teclado</a>
+                <a href="divisas.html">Divisas</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#" >Aleatorio</a>
+        <div class="submenu">
+                <a href="cara_cruz.html">Cara Cruz</a>
+                <a href="ruleta.html">Ruleta</a>
+                <a href="dado.html">Dado</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#">Biblioteca</a>
+        <div class="submenu">
+                <a href="wiki.html">Wikipedia</a>
+                <a href="github.html">Github</a>
+                <a href="reddit.html">Reddit</a>
+            </div>
+      </div>
+    </div>
+    
+    <div class="drop-zone" id="drop-zone">
+      <p>Arrastra y suelta archivos PDF aquí o haz clic para seleccionar archivos</p>
+      <input type="file" accept=".pdf" multiple class="file-input" id="file-input">
+    </div>
+    
+    <ul class="pdf-list" id="pdf-list"></ul>
+    
+    <div class="progress-bar" id="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    
+    <div class="status" id="status"></div>
+    
+    <div style="text-align: center; margin-top: 2rem;">
+      <button class="btn btn-primary" id="merge-btn" disabled>Unir PDFs</button>
+      <button class="btn btn-secondary" id="clear-btn" disabled>Limpiar Todo</button>
+    </div>
+  </div>
+    
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const pdfList = document.getElementById('pdf-list');
+    const mergeBtn = document.getElementById('merge-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const status = document.getElementById('status');
+    const progressBar = document.getElementById('progress-bar');
+    const progressFill = document.getElementById('progress-fill');
+
+    let pdfs = [];
+
+    // Initialize drag and drop sorting
+    new Sortable(pdfList, {
+      animation: 150,
+      ghostClass: 'pdf-item-ghost'
+    });
+
+    // Handle drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf');
+      handleFiles(files);
+    });
+
+    // Handle click to select files
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      handleFiles(files);
+      fileInput.value = '';
+    });
+
+    // Handle selected files
+    async function handleFiles(files) {
+      for (const file of files) {
+        if (file.type !== 'application/pdf') {
+          showStatus('Sólo se permiten archivos PDF', 'error');
+          continue;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const arrayBuffer = e.target.result;
+          
+          try {
+            // Load PDF to get page count
+            const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+            const pageCount = pdfDoc.getPageCount();
+
+            pdfs.push({
+              name: file.name,
+              size: formatFileSize(file.size),
+              pages: pageCount,
+              data: arrayBuffer
+            });
+
+            updatePDFList();
+            updateButtons();
+          } catch (error) {
+            showStatus('Error al cargar el PDF: ' + error.message, 'error');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    }
+
+    // Update the PDF list display
+    function updatePDFList() {
+      pdfList.innerHTML = '';
+      pdfs.forEach((pdf, index) => {
+        const li = document.createElement('li');
+        li.className = 'pdf-item';
+        li.innerHTML = `
+          <div class="pdf-preview">PDF</div>
+          <div class="pdf-info">
+            <div class="pdf-name">${pdf.name}</div>
+            <div class="pdf-size">${pdf.size} - ${pdf.pages} paginas</div>
+          </div>
+          <button class="remove-pdf" data-index="${index}">×</button>
+        `;
+        pdfList.appendChild(li);
+      });
+
+      // Add remove handlers
+      document.querySelectorAll('.remove-pdf').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          pdfs.splice(index, 1);
+          updatePDFList();
+          updateButtons();
+        });
+      });
+    }
+
+    // Update button states
+    function updateButtons() {
+      mergeBtn.disabled = pdfs.length < 2;
+      clearBtn.disabled = pdfs.length === 0;
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Show status message
+    function showStatus(message, type) {
+      status.textContent = message;
+      status.className = 'status ' + type;
+      setTimeout(() => {
+        status.className = 'status';
+      }, 5000);
+    }
+
+    // Handle merge
+    mergeBtn.addEventListener('click', async () => {
+      try {
+        mergeBtn.disabled = true;
+        clearBtn.disabled = true;
+        progressBar.style.display = 'block';
+        
+        // Create a new PDF document
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        
+        for (let i = 0; i < pdfs.length; i++) {
+          // Update progress
+          progressFill.style.width = `${((i + 1) / pdfs.length) * 100}%`;
+          
+          // Load source PDF
+          const pdf = await PDFLib.PDFDocument.load(pdfs[i].data);
+          
+          // Copy all pages
+          const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+          pages.forEach(page => mergedPdf.addPage(page));
+        }
+        
+        // Save the merged PDF
+        const mergedPdfFile = await mergedPdf.save();
+        
+        // Create download link
+        const blob = new Blob([mergedPdfFile], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'merged.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showStatus('¡Los archivos PDF se fusionaron exitosamente!', 'éxito');
+      } catch (error) {
+        showStatus('Error al fusionar archivos PDF: ' + error.message, 'error');
+      } finally {
+        progressBar.style.display = 'none';
+        progressFill.style.width = '0';
+        mergeBtn.disabled = false;
+        clearBtn.disabled = false;
+        updateButtons();
+      }
+    });
+
+    // Handle clear
+    clearBtn.addEventListener('click', () => {
+      pdfs = [];
+      updatePDFList();
+      updateButtons();
+      showStatus('Todos los archivos borrados', 'éxito');
+    });
+  </script>
+</body>
+</html>

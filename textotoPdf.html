@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texto a PDF</title>
+    <style>
+        body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212; /* Fondo oscuro */
+      color: white; /* Texto blanco */
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e; /* Fondo gris oscuro */
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white; /* Texto blanco */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a; /* Fondo oscuro */
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Verde para el progreso */
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white; /* Texto blanco */
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a; /* Fondo gris oscuro */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white; /* Texto blanco */
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838; /* Fondo gris al pasar el cursor */
+    }
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 14px;
+        }
+        .format-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .format-group {
+            padding: 1rem;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+        }
+        .format-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+        select, input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .margin-inputs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        .margin-inputs label {
+            font-size: 0.9rem;
+        }
+        #generate-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        #generate-btn:hover {
+            background-color: #45a049;
+        }
+        #generate-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+          <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+        </h1> 
+        <div class="menu">
+          <div class="menu-item">
+            <a href="#">Audio</a>
+            <div class="submenu">
+              <a href="conversionAudio.html">Conversión</a>
+              <a href="compressionAudio.html">Compresión</a>
+              <a href="TextoToAudio.html">Texto a Audio</a>
+              <a href="RecortarAudio.html">Recortar</a>
+              
+            </div>
+          </div>
+          
+          <div class="menu-item">
+            <a href="#" >Imagen</a>
+            <div class="submenu">
+              <a href="conversionImagen.html">Conversión</a>
+              <a href="compressionImagen.html">Compresión</a>
+              <a href="resizeImagen.html">Redimensionar</a>
+              <a href="editImage.html">Editar</a>
+              <a href="Icon.html">Icono</a>
+              <a href="paleta_img.html">Detectar Colores</a>
+              <a href="quitar_fondo.html">Borrar Fondo</a>
+            </div>
+          </div>
+          
+          <div class="menu-item">
+            <a href="#" >Video</a>
+            <div class="submenu">
+              <a href="conversionVideo.html">Conversión</a>
+              <a href="SepararAudio.html">Separar Audio</a>
+              <a href="RecortarVideo.html">Recortar</a>
+            </div>
+          </div>
+          
+          <div class="menu-item">
+            <a href="#">Qr</a>
+            <div class="submenu">
+              <a href="GenerarQr.html">Crear</a>
+              <a href="LeerQr.html">Leer</a>
+            </div>
+          </div>
+          
+          <div class="menu-item">
+            <a href="#" class="active">Archivos</a>
+            <div class="submenu">
+              <a href="pdfunion.html">Unir PDF</a>
+              <a href="pdfsepar.html">Separar PDF</a>
+              <a href="deletepdf.html">Borrar PDF</a>
+              <a href="textotoPdf.html">Texto a PDF</a>
+              <a href="excel.html">Excel/CSV</a>
+            </div>
+          </div>
+          
+          <div class="menu-item">
+            <a href="#" >Herramientas</a>
+            <div class="submenu">
+                    <a href="speedtest.html">Test de Internet</a>
+                    <a href="resumidor.html">Resumidor de Textos</a>
+                    <a href="GenerarPass.html">Generar Contraseña</a>
+                    <a href="VerifyPass.html">Verificar Contraseña</a>
+                    <a href="clicktest.html">Test de Mouse</a>
+                    <a href="Testeclado.html">Test de Teclado</a>
+                    <a href="divisas.html">Divisas</a>
+                </div>
+          </div>
+          <div class="menu-item">
+            <a href="#" >Aleatorio</a>
+            <div class="submenu">
+                    <a href="cara_cruz.html">Cara Cruz</a>
+                    <a href="ruleta.html">Ruleta</a>
+                    <a href="dado.html">Dado</a>
+                </div>
+          </div>
+          <div class="menu-item">
+            <a href="#">Biblioteca</a>
+            <div class="submenu">
+                    <a href="wiki.html">Wikipedia</a>
+                    <a href="github.html">Github</a>
+                    <a href="reddit.html">Reddit</a>
+                </div>
+          </div>
+        </div>
+        
+        <div class="input-section">
+            <h2>Introduce tu texto</h2>
+            <textarea id="text-input" class="text-input" placeholder="Escribe o pega tu texto aquí..."></textarea>
+        </div>
+        
+        <div class="format-options">
+            <div class="format-group">
+                <label>Familia de Fuentes</label>
+                <select id="font-family">
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times-Roman">Times New Roman</option>
+                    <option value="Courier">Courier</option>
+                    <option value="Arial">Arial</option>
+                </select>
+        
+                <label>Tamaño de Fuente</label>
+                <input type="number" id="font-size" value="12" min="8" max="72">
+            </div>
+        
+            <div class="format-group">
+                <label>Margenes (mm)</label>
+                <div class="margin-inputs">
+                    <div>
+                        <label>Superior</label>
+                        <input type="number" id="margin-top" value="20" min="0" max="100">
+                    </div>
+                    <div>
+                        <label>Derecho</label>
+                        <input type="number" id="margin-right" value="20" min="0" max="100">
+                    </div>
+                    <div>
+                        <label>Inferior</label>
+                        <input type="number" id="margin-bottom" value="20" min="0" max="100">
+                    </div>
+                    <div>
+                        <label>Izquierdo</label>
+                        <input type="number" id="margin-left" value="20" min="0" max="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="generate-btn">Generar PDF</button>
+    </div>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        window.jsPDF = window.jspdf.jsPDF;
+
+        const textInput = document.getElementById('text-input');
+        const fontFamily = document.getElementById('font-family');
+        const fontSize = document.getElementById('font-size');
+        const marginTop = document.getElementById('margin-top');
+        const marginRight = document.getElementById('margin-right');
+        const marginBottom = document.getElementById('margin-bottom');
+        const marginLeft = document.getElementById('margin-left');
+        const generateBtn = document.getElementById('generate-btn');
+
+        generateBtn.addEventListener('click', generatePDF);
+
+        function generatePDF() {
+            const doc = new jsPDF();
+            
+            // Convert mm to points (1 mm = 2.83465 points)
+            const topMargin = parseFloat(marginTop.value) * 2.83465;
+            const rightMargin = parseFloat(marginRight.value) * 2.83465;
+            const bottomMargin = parseFloat(marginBottom.value) * 2.83465;
+            const leftMargin = parseFloat(marginLeft.value) * 2.83465;
+
+            // Set font
+            doc.setFont(fontFamily.value);
+            doc.setFontSize(parseFloat(fontSize.value));
+
+            // Calculate page width and height in points
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // Calculate maximum width for text
+            const maxWidth = pageWidth - leftMargin - rightMargin;
+
+            // Split text into lines that fit within margins
+            const lines = doc.splitTextToSize(textInput.value, maxWidth);
+
+            // Calculate lines per page
+            const lineHeight = doc.getLineHeight() / doc.internal.scaleFactor;
+            const maxLinesPerPage = Math.floor((pageHeight - topMargin - bottomMargin) / lineHeight);
+
+            // Add text page by page
+            let currentPage = 1;
+            for (let i = 0; i < lines.length; i += maxLinesPerPage) {
+                if (currentPage > 1) {
+                    doc.addPage();
+                }
+
+                const pageLines = lines.slice(i, i + maxLinesPerPage);
+                doc.text(pageLines, leftMargin / 2.83465, topMargin / 2.83465);
+                currentPage++;
+            }
+
+            // Save the PDF
+            doc.save('generated-document.pdf');
+        }
+    </script>
+</body>
+</html>

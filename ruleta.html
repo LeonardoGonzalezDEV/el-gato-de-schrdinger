@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta Mágica</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --background-color: #0f0c29;
+            --text-color: #ffffff;
+        }
+        .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e; /* Fondo gris oscuro */
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+        h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white; /* Texto blanco */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a; /* Fondo oscuro */
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Verde para el progreso */
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white; /* Texto blanco */
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a; /* Fondo gris oscuro */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white; /* Texto blanco */
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838; /* Fondo gris al pasar el cursor */
+    }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--background-color) 0%, #6a11cb 50%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            overflow-x: hidden;
+            color: var(--text-color);
+        }
+
+        
+
+        .wheel-header h1 {
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .mode-toggle button {
+            background: transparent;
+            border: none;
+            padding: 10px 20px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mode-toggle button.active {
+            color: var(--background-color);
+        }
+
+        .mode-toggle button.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #fff, #eee);
+            z-index: -1;
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-section input {
+            flex-grow: 1;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: var(--text-color);
+        }
+
+        .input-section button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .input-section button:hover {
+            transform: scale(1.05);
+        }
+
+        .items-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .item-row .delete-btn {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .item-row .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        #wheel-canvas {
+            width: 100%;
+            max-width: 500px;
+            height: 500px;
+            margin: 0 auto;
+            display: block;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .spin-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255,71,87,0.4);
+        }
+
+        .spin-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255,71,87,0.6);
+        }
+
+        .result-display {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* Scrollbar Styling */
+        .items-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .items-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .items-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <div class="wheel-container">
+        <div class="wheel-header">
+            <h1>
+                <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+              </h1> 
+              <div class="menu">
+                <div class="menu-item">
+                  <a href="#">Audio</a>
+                  <div class="submenu">
+                    <a href="conversionAudio.html">Conversión</a>
+                    <a href="compressionAudio.html">Compresión</a>
+                    <a href="TextoToAudio.html">Texto a Audio</a>
+                    <a href="RecortarAudio.html">Recortar</a>
+                    
+                  </div>
+                </div>
+                
+                <div class="menu-item">
+                  <a href="#" >Imagen</a>
+                  <div class="submenu">
+                    <a href="conversionImagen.html">Conversión</a>
+                    <a href="compressionImagen.html">Compresión</a>
+                    <a href="resizeImagen.html">Redimensionar</a>
+                    <a href="editImage.html">Editar</a>
+                    <a href="Icon.html">Icono</a>
+                    <a href="paleta_img.html">Detectar Colores</a>
+                    <a href="quitar_fondo.html">Borrar Fondo</a>
+                  </div>
+                </div>
+                
+                <div class="menu-item">
+                  <a href="#" >Video</a>
+                  <div class="submenu">
+                    <a href="conversionVideo.html">Conversión</a>
+                    <a href="SepararAudio.html">Separar Audio</a>
+                    <a href="RecortarVideo.html">Recortar</a>
+                  </div>
+                </div>
+                
+                <div class="menu-item">
+                  <a href="#">Qr</a>
+                  <div class="submenu">
+                    <a href="GenerarQr.html">Crear</a>
+                    <a href="LeerQr.html">Leer</a>
+                  </div>
+                </div>
+                
+                <div class="menu-item">
+                  <a href="#" >Archivos</a>
+                  <div class="submenu">
+                    <a href="pdfunion.html">Unir PDF</a>
+                    <a href="pdfsepar.html">Separar PDF</a>
+                    <a href="deletepdf.html">Borrar PDF</a>
+                    <a href="textotoPdf.html">Texto a PDF</a>
+                    <a href="excel.html">Excel/CSV</a>
+                  </div>
+                </div>
+                
+                <div class="menu-item">
+                  <a href="#" >Herramientas</a>
+                  <div class="submenu">
+                          <a href="speedtest.html">Test de Internet</a>
+                          <a href="resumidor.html">Resumidor de Textos</a>
+                          <a href="GenerarPass.html">Generar Contraseña</a>
+                          <a href="VerifyPass.html">Verificar Contraseña</a>
+                          <a href="clicktest.html">Test de Mouse</a>
+                          <a href="Testeclado.html">Test de Teclado</a>
+                          <a href="divisas.html">Divisas</a>
+                      </div>
+                </div>
+                <div class="menu-item">
+                  <a href="#" class="active">Aleatorio</a>
+                  <div class="submenu">
+                          <a href="cara_cruz.html">Cara Cruz</a>
+                          <a href="ruleta.html">Ruleta</a>
+                          <a href="dado.html">Dado</a>
+                      </div>
+                </div>
+                <div class="menu-item">
+                  <a href="#">Biblioteca</a>
+                  <div class="submenu">
+                          <a href="wiki.html">Wikipedia</a>
+                          <a href="github.html">Github</a>
+                          <a href="reddit.html">Reddit</a>
+                      </div>
+                </div>
+              </div>
+            <div class="mode-toggle">
+                <button onclick="switchMode('names')" class="active">Nombres</button>
+                <button onclick="switchMode('numbers')">Números</button>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="item-input" placeholder="Ingresa un nombre">
+            <input type="number" id="range-start" placeholder="Desde" style="display:none;">
+            <input type="number" id="range-end" placeholder="Hasta" style="display:none;">
+            <button onclick="addItem()">
+                <i class="fas fa-plus"></i> Agregar
+            </button>
+            <button onclick="generateNumbers()" id="generate-btn" style="display:none;">
+                <i class="fas fa-magic"></i> Generar
+            </button>
+        </div>
+
+        <div class="items-list" id="items-list"></div>
+
+        <canvas id="wheel-canvas"></canvas>
+
+        <button class="spin-btn" onclick="spinWheel()">
+            <i class="fas fa-spinner"></i> Girar Ruleta
+        </button>
+
+        <div class="result-display" id="result-display"></div>
+    </div>
+</div>
+    
+
+    <script>
+        const canvas = document.getElementById('wheel-canvas');
+        const ctx = canvas.getContext('2d');
+        const itemInput = document.getElementById('item-input');
+        const rangeStart = document.getElementById('range-start');
+        const rangeEnd = document.getElementById('range-end');
+        const itemsList = document.getElementById('items-list');
+        const resultDisplay = document.getElementById('result-display');
+        const generateBtn = document.getElementById('generate-btn');
+
+        canvas.width = 500;
+        canvas.height = 500;
+
+        let items = [];
+        let mode = 'names';
+
+        function switchMode(newMode) {
+            mode = newMode;
+            const modeButtons = document.querySelectorAll('.mode-toggle button');
+            modeButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (mode === 'names') {
+                itemInput.style.display = 'block';
+                rangeStart.style.display = 'none';
+                rangeEnd.style.display = 'none';
+                generateBtn.style.display = 'none';
+            } else {
+                itemInput.style.display = 'none';
+                rangeStart.style.display = 'block';
+                rangeEnd.style.display = 'block';
+                generateBtn.style.display = 'block';
+            }
+
+            items = [];
+            updateItemsList();
+        }
+
+        function addItem() {
+            const input = mode === 'names' ? itemInput : null;
+            const item = input ? input.value.trim() : null;
+
+            if (item && !items.includes(item)) {
+                items.push(item);
+                input.value = '';
+                updateItemsList();
+            }
+        }
+
+        function generateNumbers() {
+            const start = parseInt(rangeStart.value);
+            const end = parseInt(rangeEnd.value);
+
+            if (start && end && start <= end) {
+                items = Array.from({length: end - start + 1}, (_, i) => (start + i).toString());
+                updateItemsList();
+            }
+        }
+
+        function updateItemsList() {
+            itemsList.innerHTML = items.map((item, index) => `
+                <div class="item-row">
+                    ${item}
+                    <button class="delete-btn" onclick="removeItem(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+            drawWheel();
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            updateItemsList();
+        }
+
+        function drawWheel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (items.length === 0) return;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 20;
+            const numSegments = items.length;
+            const angleStep = (Math.PI * 2) / numSegments;
+
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', 
+                '#FDCB6E', '#6C5CE7', '#FF8A5B'
+            ];
+
+            items.forEach((item, index) => {
+                const startAngle = index * angleStep;
+                const endAngle = (index + 1) * angleStep;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.fill();
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + angleStep / 2);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(item, radius * 0.7, 0);
+                ctx.restore();
+            });
+
+            // Indicador
+            ctx.beginPath();
+            ctx.moveTo(centerX, 20);
+            ctx.lineTo(centerX - 15, 0);
+            ctx.lineTo(centerX + 15, 0);
+            ctx.closePath();
+            ctx.fillStyle = '#FF4757';
+            ctx.fill();
+        }
+
+        function spinWheel() {
+            if (items.length === 0) {
+                alert('Agrega elementos primero');
+                return;
+            }
+
+            const totalRotation = Math.random() * Math.PI * 2 + Math.PI * 10;
+            const startTime = performance.now();
+            const duration = 5000;
+
+            function animate(currentTime) {
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1);
+                
+                const currentRotation = totalRotation * (1 - Math.pow(1 - progress, 4));
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(currentRotation);
+                ctx.translate(-canvas.width / 2, -canvas.height / 2);
+                
+                drawWheel();
+                
+                ctx.restore();
+
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, 20);
+                ctx.lineTo(canvas.width / 2 - 15, 0);
+                ctx.lineTo(canvas.width / 2 + 15, 0);
+                ctx.closePath();
+                ctx.fillStyle = '#FF4757';
+                ctx.fill();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    const winningIndex = Math.floor(
+                        (((Math.PI * 2 - (currentRotation % (Math.PI * 2))) / (Math.PI * 2)) * items.length)
+                    );
+                    resultDisplay.innerHTML = `🎉 Ganador: <strong>${items[winningIndex]}</strong>`;
+                    resultDisplay.style.animation = 'pulse 1s infinite alternate';
+                }
+            }
+
+            resultDisplay.innerHTML = '⏳ Girando...';
+            resultDisplay.style.animation = 'none';
+            requestAnimationFrame(animate);
+        }
+
+        // Inicializar
+        drawWheel();
+    </script>
+</body>
+</html>

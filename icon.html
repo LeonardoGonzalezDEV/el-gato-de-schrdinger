@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertidor de ICO</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      color: white;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .preview-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white;
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white;
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838;
+    }
+    input[type="file"] {
+      display: block;
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background-color: #444444;
+      color: #ffffff;
+      border: 2px solid #555555;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    input[type="file"]::-webkit-file-upload-button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    input[type="file"]::-webkit-file-upload-button:hover {
+      background-color: #45a049;
+    }
+    .preview-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .preview-item {
+      background-color: #2a2a2a;
+      padding: 1rem;
+      border-radius: 5px;
+      text-align: center;
+    }
+    .preview-item img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 0.5rem;
+    }
+    .preview-item p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #888;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 1rem;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .size-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .size-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: #2a2a2a;
+      padding: 0.5rem;
+      border-radius: 5px;
+    }
+    .size-option input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a;
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .file-list {
+      margin-top: 1rem;
+    }
+    .file-item {
+      background-color: #2a2a2a;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+    }
+    .file-name {
+      margin-bottom: 0.5rem;
+    }
+    .status {
+      margin-top: 0.5rem;
+      font-size: 0.9em;
+      color: #888;
+    }
+    /* ... rest of previous styles ... */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+    </h1> 
+    <div class="menu">
+      <div class="menu-item">
+        <a href="#">Audio</a>
+        <div class="submenu">
+          <a href="conversionAudio.html">Conversión</a>
+          <a href="compressionAudio.html">Compresión</a>
+          <a href="TextoToAudio.html">Texto a Audio</a>
+          <a href="RecortarAudio.html">Recortar</a>
+          
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" class="active">Imagen</a>
+        <div class="submenu">
+          <a href="conversionImagen.html">Conversión</a>
+          <a href="compressionImagen.html">Compresión</a>
+          <a href="resizeImagen.html">Redimensionar</a>
+          <a href="editImage.html">Editar</a>
+          <a href="Icon.html">Icono</a>
+          <a href="paleta_img.html">Detectar Colores</a>
+          <a href="quitar_fondo.html">Borrar Fondo</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Video</a>
+        <div class="submenu">
+          <a href="conversionVideo.html">Conversión</a>
+          <a href="SepararAudio.html">Separar Audio</a>
+          <a href="RecortarVideo.html">Recortar</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#">Qr</a>
+        <div class="submenu">
+          <a href="GenerarQr.html">Crear</a>
+          <a href="LeerQr.html">Leer</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Archivos</a>
+        <div class="submenu">
+          <a href="pdfunion.html">Unir PDF</a>
+          <a href="pdfsepar.html">Separar PDF</a>
+          <a href="deletepdf.html">Borrar PDF</a>
+          <a href="textotoPdf.html">Texto a PDF</a>
+          <a href="excel.html">Excel/CSV</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Herramientas</a>
+        <div class="submenu">
+                <a href="speedtest.html">Test de Internet</a>
+                <a href="resumidor.html">Resumidor de Textos</a>
+                <a href="GenerarPass.html">Generar Contraseña</a>
+                <a href="VerifyPass.html">Verificar Contraseña</a>
+                <a href="clicktest.html">Test de Mouse</a>
+                <a href="Testeclado.html">Test de Teclado</a>
+                <a href="divisas.html">Divisas</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#" >Aleatorio</a>
+        <div class="submenu">
+                <a href="cara_cruz.html">Cara Cruz</a>
+                <a href="ruleta.html">Ruleta</a>
+                <a href="dado.html">Dado</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#">Biblioteca</a>
+        <div class="submenu">
+                <a href="wiki.html">Wikipedia</a>
+                <a href="github.html">Github</a>
+                <a href="reddit.html">Reddit</a>
+            </div>
+      </div>
+    </div>
+    <div class="input-section">
+      <h2>Seleccionar Imágenes</h2>
+      <p>Formatos soportados: PNG, JPG, JPEG, GIF</p>
+      <input type="file" id="input-files" accept="image/*" multiple>
+      <div id="file-list" class="file-list"></div>
+    </div>
+
+    <div class="preview-section">
+      <h2>Tamaños del Icono</h2>
+      <div class="size-options">
+        <div class="size-option">
+          <input type="checkbox" id="size-16" checked>
+          <label for="size-16">16x16</label>
+        </div>
+        <div class="size-option">
+          <input type="checkbox" id="size-32" checked>
+          <label for="size-32">32x32</label>
+        </div>
+        <div class="size-option">
+          <input type="checkbox" id="size-48" checked>
+          <label for="size-48">48x48</label>
+        </div>
+        <div class="size-option">
+          <input type="checkbox" id="size-64">
+          <label for="size-64">64x64</label>
+        </div>
+        <div class="size-option">
+          <input type="checkbox" id="size-128">
+          <label for="size-128">128x128</label>
+        </div>
+        <div class="size-option">
+          <input type="checkbox" id="size-256">
+          <label for="size-256">256x256</label>
+        </div>
+        <div class="size-option">
+          <input type="checkbox" id="size-512">
+          <label for="size-512">512x512</label>
+        </div>
+      </div>
+      
+      <h2>Vista Previa</h2>
+      <div class="preview-container" id="preview-container"></div>
+    </div>
+
+    <div class="output-section">
+      <button id="convert-btn">Convertir a ICO</button>
+    </div>
+  </div>
+
+  <script>
+    const inputFiles = document.getElementById('input-files');
+    const fileList = document.getElementById('file-list');
+    const previewContainer = document.getElementById('preview-container');
+    const convertBtn = document.getElementById('convert-btn');
+
+    // Array of standard icon sizes
+    const sizes = [16, 32, 48, 64, 128, 256, 512];
+    let files = [];
+
+    inputFiles.addEventListener('change', (e) => {
+      files = Array.from(e.target.files);
+      updateFileList();
+      updatePreviews();
+    });
+
+    function updateFileList() {
+      fileList.innerHTML = '';
+      files.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <div class="file-name">${file.name}</div>
+          <div class="progress-bar">
+            <div class="progress" id="progress-${index}"></div>
+          </div>
+          <div class="status" id="status-${index}">Pendiente</div>
+        `;
+        fileList.appendChild(fileItem);
+      });
+    }
+
+    function updatePreviews() {
+      previewContainer.innerHTML = '';
+      if (files.length === 0) return;
+
+      // Show previews for the first file only
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageUrl = e.target.result;
+        sizes.forEach(size => {
+          const checkbox = document.getElementById(`size-${size}`);
+          if (!checkbox.checked) return;
+
+          const previewItem = document.createElement('div');
+          previewItem.className = 'preview-item';
+          
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          
+          const img = new Image();
+          img.onload = function() {
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, size, size);
+          };
+          img.src = imageUrl;
+          
+          const text = document.createElement('p');
+          text.textContent = `${size}x${size}`;
+          
+          previewItem.appendChild(canvas);
+          previewItem.appendChild(text);
+          previewContainer.appendChild(previewItem);
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function convertToIco() {
+      if (files.length === 0) {
+        alert('Por favor selecciona al menos una imagen');
+        return;
+      }
+
+      const selectedSizes = sizes.filter(size => 
+        document.getElementById(`size-${size}`).checked
+      );
+
+      if (selectedSizes.length === 0) {
+        alert('Por favor selecciona al menos un tamaño');
+        return;
+      }
+
+      files.forEach(async (file, fileIndex) => {
+        try {
+          const statusElement = document.getElementById(`status-${fileIndex}`);
+          const progressBar = document.getElementById(`progress-${fileIndex}`);
+          statusElement.textContent = 'Convirtiendo...';
+
+          // Create canvas for each selected size
+          const canvases = await Promise.all(selectedSizes.map(async size => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            return new Promise((resolve) => {
+              const img = new Image();
+              img.onload = () => {
+                ctx.drawImage(img, 0, 0, size, size);
+                resolve(canvas);
+              };
+              img.src = URL.createObjectURL(file);
+            });
+          }));
+
+          // Simulate progress
+          let progress = 0;
+          const interval = setInterval(() => {
+            progress += 10;
+            if (progressBar) progressBar.style.width = `${progress}%`;
+            
+            if (progress >= 100) {
+              clearInterval(interval);
+              
+              // Generate a separate ICO file for each selected size
+              selectedSizes.forEach((size, index) => {
+                const canvas = canvases[index];
+                canvas.toBlob((blob) => {
+                  const fileName = `${file.name.split('.')[0]}_${size}x${size}.ico`;
+                  downloadFile(blob, fileName);
+                });
+              });
+
+              statusElement.textContent = 'Completado';
+              statusElement.style.color = '#4caf50';
+            }
+          }, 100);
+
+        } catch (error) {
+          console.error(`Error al convertir ${file.name}:`, error);
+          const statusElement = document.getElementById(`status-${fileIndex}`);
+          statusElement.textContent = 'Error al convertir';
+          statusElement.style.color = '#ff5252';
+        }
+      });
+    }
+
+    function downloadFile(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    // Initialize size checkboxes event listeners
+    sizes.forEach(size => {
+      const checkbox = document.getElementById(`size-${size}`);
+      checkbox.addEventListener('change', updatePreviews);
+    });
+
+    convertBtn.addEventListener('click', convertToIco);
+  </script>
+</body>
+</html>

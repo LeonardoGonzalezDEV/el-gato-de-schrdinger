@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Convertidor de Tiempo Mundial</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 350px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #result {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Convertidor de Tiempo Mundial</h2>
+        <div class="input-group">
+            <select id="fromTimezone">
+                <option value="UTC">UTC</option>
+                <option value="America/New_York">New York</option>
+                <option value="America/Los_Angeles">Los Angeles</option>
+                <option value="Europe/London">Londres</option>
+                <option value="Europe/Paris">París</option>
+                <option value="Asia/Tokyo">Tokio</option>
+                <option value="Asia/Dubai">Dubái</option>
+                <option value="Australia/Sydney">Sídney</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <select id="toTimezone">
+                <option value="UTC">UTC</option>
+                <option value="America/New_York">New York</option>
+                <option value="America/Los_Angeles">Los Angeles</option>
+                <option value="Europe/London">Londres</option>
+                <option value="Europe/Paris">París</option>
+                <option value="Asia/Tokyo">Tokio</option>
+                <option value="Asia/Dubai">Dubái</option>
+                <option value="Australia/Sydney">Sídney</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="datetime-local" id="inputTime" step="1">
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Función para convertir zonas horarias
+        function convertTimezone() {
+            const fromTimezone = document.getElementById('fromTimezone').value;
+            const toTimezone = document.getElementById('toTimezone').value;
+            const inputTimeElement = document.getElementById('inputTime');
+            const resultElement = document.getElementById('result');
+
+            // Si no se ha seleccionado tiempo, usar el actual
+            const inputTime = inputTimeElement.value 
+                ? new Date(inputTimeElement.value) 
+                : new Date();
+
+            try {
+                // Convertir a la zona horaria de destino
+                const convertedTime = inputTime.toLocaleString('es-ES', { 
+                    timeZone: toTimezone,
+                    dateStyle: 'full',
+                    timeStyle: 'long'
+                });
+
+                resultElement.innerHTML = `
+                    <strong>Hora convertida:</strong><br>
+                    ${convertedTime}
+                `;
+            } catch (error) {
+                resultElement.innerHTML = 'Error en la conversión';
+            }
+        }
+
+        // Establecer tiempo actual por defecto
+        document.getElementById('inputTime').value = 
+            new Date().toISOString().slice(0,16);
+
+        // Añadir listeners de eventos
+        document.getElementById('fromTimezone').addEventListener('change', convertTimezone);
+        document.getElementById('toTimezone').addEventListener('change', convertTimezone);
+        document.getElementById('inputTime').addEventListener('change', convertTimezone);
+
+        // Conversión inicial
+        convertTimezone();
+    </script>
+</body>
+</html>

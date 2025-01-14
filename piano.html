@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Piano</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .piano {
+            display: flex;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            max-width: 1000px;
+            justify-content: center;
+        }
+        .key {
+            position: relative;
+            width: 60px;
+            height: 200px;
+            border: 2px solid #000;
+            margin: 0 2px;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+        }
+        .key-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        .key.white {
+            background-color: white;
+            z-index: 1;
+        }
+        .key.black {
+            background-color: black;
+            width: 40px;
+            height: 120px;
+            margin-left: -20px;
+            margin-right: -20px;
+            z-index: 2;
+        }
+        .key.pressed {
+            transform: scale(0.95);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .key.white.pressed {
+            background-color: #f0f0f0;
+        }
+        .key.black.pressed {
+            background-color: #333;
+        }
+        .key-note {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .key-key {
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="piano" id="piano"></div>
+
+    <script>
+        const notes = [
+            // Lower Octave
+            { name: 'C3', frequency: 130.81, key: 'z' },
+            { name: 'C#3', frequency: 138.59, key: 's', isBlack: true },
+            { name: 'D3', frequency: 146.83, key: 'x' },
+            { name: 'D#3', frequency: 155.56, key: 'd', isBlack: true },
+            { name: 'E3', frequency: 164.81, key: 'c' },
+            { name: 'F3', frequency: 174.61, key: 'v' },
+            { name: 'F#3', frequency: 185.00, key: 'g', isBlack: true },
+            { name: 'G3', frequency: 196.00, key: 'b' },
+            { name: 'G#3', frequency: 207.65, key: 'h', isBlack: true },
+            { name: 'A3', frequency: 220.00, key: 'n' },
+            { name: 'A#3', frequency: 233.08, key: 'j', isBlack: true },
+            { name: 'B3', frequency: 246.94, key: 'm' },
+
+            // Middle Octave
+            { name: 'C4', frequency: 261.63, key: 'a' },
+            { name: 'C#4', frequency: 277.18, key: 'w', isBlack: true },
+            { name: 'D4', frequency: 293.66, key: 's' },
+            { name: 'D#4', frequency: 311.13, key: 'e', isBlack: true },
+            { name: 'E4', frequency: 329.63, key: 'd' },
+            { name: 'F4', frequency: 349.23, key: 'f' },
+            { name: 'F#4', frequency: 369.99, key: 't', isBlack: true },
+            { name: 'G4', frequency: 392.00, key: 'g' },
+            { name: 'G#4', frequency: 415.30, key: 'y', isBlack: true },
+            { name: 'A4', frequency: 440.00, key: 'h' },
+            { name: 'A#4', frequency: 466.16, key: 'u', isBlack: true },
+            { name: 'B4', frequency: 493.88, key: 'j' },
+
+            // Higher Octave
+            { name: 'C5', frequency: 523.25, key: 'q' },
+            { name: 'C#5', frequency: 554.37, key: '2', isBlack: true },
+            { name: 'D5', frequency: 587.33, key: 'w' },
+            { name: 'D#5', frequency: 622.25, key: '3', isBlack: true },
+            { name: 'E5', frequency: 659.25, key: 'e' },
+            { name: 'F5', frequency: 698.46, key: 'r' },
+            { name: 'F#5', frequency: 739.99, key: '5', isBlack: true },
+            { name: 'G5', frequency: 783.99, key: 't' },
+            { name: 'G#5', frequency: 830.61, key: '6', isBlack: true },
+            { name: 'A5', frequency: 880.00, key: 'y' },
+            { name: 'A#5', frequency: 932.33, key: '7', isBlack: true },
+            { name: 'B5', frequency: 987.77, key: 'u' }
+        ];
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const piano = document.getElementById('piano');
+
+        function createPianoKeys() {
+            notes.forEach((note) => {
+                const key = document.createElement('div');
+                key.classList.add('key');
+                key.classList.add(note.isBlack ? 'black' : 'white');
+                key.dataset.note = note.name;
+                key.dataset.frequency = note.frequency;
+                key.dataset.key = note.key;
+
+                // Create note label
+                const noteLabel = document.createElement('div');
+                noteLabel.classList.add('key-note');
+                noteLabel.textContent = note.name;
+                key.appendChild(noteLabel);
+
+                // Create key label
+                const keyLabel = document.createElement('div');
+                keyLabel.classList.add('key-key');
+                keyLabel.textContent = note.key;
+                key.appendChild(keyLabel);
+
+                piano.appendChild(key);
+            });
+        }
+
+        function playNote(frequency) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            
+            // Create a smooth volume envelope
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function handleNotePress(key, isKeyboard = false) {
+            const noteElement = isKeyboard 
+                ? document.querySelector(`.key[data-key="${key}"]`)
+                : key;
+            
+            if (!noteElement) return;
+
+            const frequency = parseFloat(noteElement.dataset.frequency);
+            playNote(frequency);
+
+            noteElement.classList.add('pressed');
+            setTimeout(() => {
+                noteElement.classList.remove('pressed');
+            }, 200);
+        }
+
+        createPianoKeys();
+
+        // Mouse events
+        piano.addEventListener('mousedown', (e) => {
+            const key = e.target.closest('.key');
+            if (key) {
+                handleNotePress(key);
+            }
+        });
+
+        // Keyboard events
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            handleNotePress(key, true);
+        });
+    </script>
+</body>
+</html>

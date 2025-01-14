@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificador de Contraseñas</title>
+  <style>
+     body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212; /* Fondo oscuro */
+      color: white; /* Texto blanco */
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e; /* Fondo gris oscuro */
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white; /* Texto blanco */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .input-section, .output-section {
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #2a2a2a; /* Fondo oscuro */
+      margin-top: 1rem;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      background-color: #4caf50; /* Verde para el progreso */
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white; /* Texto blanco */
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a; /* Fondo gris oscuro */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white; /* Texto blanco */
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838; /* Fondo gris al pasar el cursor */
+    }
+    .password-input {
+      width: 100%;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      transition: border-color 0.3s ease;
+    }
+    .password-input:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+    .strength-meter {
+      height: 8px;
+      background-color: #2a2a2a;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .strength-label {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      transition: color 0.3s ease;
+    }
+    .analysis-container {
+      background-color: #2a2a2a;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+    .checks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .check-item i {
+      font-size: 1.2rem;
+    }
+    .check-item.passed {
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    .check-item.failed {
+      color: #c62828;
+      border-left: 4px solid #c62828;
+    }
+    .suggestions {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background-color: #e8f5e9;
+      border-radius: 8px;
+    }
+    .suggestions h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+    .suggestion-list {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+    .suggestion-list li {
+      margin-bottom: 0.5rem;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+    </h1> 
+    <div class="menu">
+      <div class="menu-item">
+        <a href="#">Audio</a>
+        <div class="submenu">
+          <a href="conversionAudio.html">Conversión</a>
+          <a href="compressionAudio.html">Compresión</a>
+          <a href="TextoToAudio.html">Texto a Audio</a>
+          <a href="RecortarAudio.html">Recortar</a>
+          
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Imagen</a>
+        <div class="submenu">
+          <a href="conversionImagen.html">Conversión</a>
+          <a href="compressionImagen.html">Compresión</a>
+          <a href="resizeImagen.html">Redimensionar</a>
+          <a href="editImage.html">Editar</a>
+          <a href="Icon.html">Icono</a>
+          <a href="paleta_img.html">Detectar Colores</a>
+          <a href="quitar_fondo.html">Borrar Fondo</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Video</a>
+        <div class="submenu">
+          <a href="conversionVideo.html">Conversión</a>
+          <a href="SepararAudio.html">Separar Audio</a>
+          <a href="RecortarVideo.html">Recortar</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#">Qr</a>
+        <div class="submenu">
+          <a href="GenerarQr.html">Crear</a>
+          <a href="LeerQr.html">Leer</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Archivos</a>
+        <div class="submenu">
+          <a href="pdfunion.html">Unir PDF</a>
+          <a href="pdfsepar.html">Separar PDF</a>
+          <a href="deletepdf.html">Borrar PDF</a>
+          <a href="textotoPdf.html">Texto a PDF</a>
+          <a href="excel.html">Excel/CSV</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" class="active">Herramientas</a>
+        <div class="submenu">
+                <a href="speedtest.html">Test de Internet</a>
+                <a href="resumidor.html">Resumidor de Textos</a>
+                <a href="GenerarPass.html">Generar Contraseña</a>
+                <a href="VerifyPass.html">Verificar Contraseña</a>
+                <a href="clicktest.html">Test de Mouse</a>
+                <a href="Testeclado.html">Test de Teclado</a>
+                <a href="divisas.html">Divisas</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#" >Aleatorio</a>
+        <div class="submenu">
+                <a href="cara_cruz.html">Cara Cruz</a>
+                <a href="ruleta.html">Ruleta</a>
+                <a href="dado.html">Dado</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#">Biblioteca</a>
+        <div class="submenu">
+                <a href="wiki.html">Wikipedia</a>
+                <a href="github.html">Github</a>
+                <a href="reddit.html">Reddit</a>
+            </div>
+      </div>
+    </div>
+  
+  <input type="password" 
+         id="password-input" 
+         class="password-input" 
+         placeholder="Ingresa tu contraseña para verificar su fortaleza"
+         autocomplete="off">
+  
+  <div class="strength-meter">
+      <div class="strength-bar" id="strength-bar"></div>
+  </div>
+  
+  <div class="strength-label" id="strength-label">Ingresa una contraseña</div>
+  
+  <div class="analysis-container" id="analysis-container" style="display: none;">
+      <div class="checks-grid" id="checks-grid"></div>
+  
+      <div class="suggestions">
+          <h3>Cómo Mejorar tu Contraseña</h3>
+          <ul class="suggestion-list" id="suggestions">
+          </ul>
+      </div>
+  </div>
+</div>
+  
+
+<script>
+  const passwordInput = document.getElementById('password-input');
+  const strengthBar = document.getElementById('strength-bar');
+  const strengthLabel = document.getElementById('strength-label');
+  const analysisContainer = document.getElementById('analysis-container');
+  const checksGrid = document.getElementById('checks-grid');
+  const suggestions = document.getElementById('suggestions');
+
+  function calculatePasswordStrength(password) {
+    if (!password) return 0;
+
+    let strength = 0;
+    const checks = {
+      length: password.length >= 12,
+      minLength: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      numbers: /\d/.test(password),
+      symbols: /[^A-Za-z0-9]/.test(password),
+      noCommon: !isCommonPattern(password),
+      specialSymbols: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+      noRepeating: !/(.)\1{2,}/.test(password), // No más de 2 caracteres repetidos
+      noSequential: !hasSequentialPatterns(password),
+      multipleNumbers: (password.match(/\d/g) || []).length >= 2,
+      multipleSpecial: (password.match(/[^A-Za-z0-9]/g) || []).length >= 2
+    };
+
+    // Penalizaciones y bonificaciones más estrictas
+    strength += Math.min(password.length * 3, 30); // Máximo 30 puntos por longitud
+    strength += checks.uppercase ? 10 : 0;
+    strength += checks.lowercase ? 10 : 0;
+    strength += checks.numbers ? 10 : 0;
+    strength += checks.symbols ? 15 : 0;
+    strength += checks.noCommon ? 15 : -20; // Mayor penalización por patrones comunes
+    strength += checks.specialSymbols ? 10 : 0;
+    strength += checks.noRepeating ? 10 : -10;
+    strength += checks.noSequential ? 10 : -10;
+    strength += checks.multipleNumbers ? 10 : 0;
+    strength += checks.multipleSpecial ? 15 : 0;
+    
+    // Bonificación por combinación de características
+    if (checks.uppercase && checks.lowercase && checks.numbers && checks.symbols) {
+      strength += 15;
+    }
+
+    // Penalizaciones adicionales
+    if (password.length < 12) strength -= 20;
+    if (password.length < 8) strength -= 30;
+    
+    return Math.max(0, Math.min(100, strength));
+  }
+
+  function hasSequentialPatterns(password) {
+    const sequences = [
+      "abcdefghijklmnopqrstuvwxyz",
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "0123456789",
+      "qwertyuiop",
+      "asdfghjkl",
+      "zxcvbnm"
+    ];
+    
+    for (let seq of sequences) {
+      for (let i = 0; i < seq.length - 3; i++) {
+        const pattern = seq.slice(i, i + 4);
+        if (password.includes(pattern) || password.includes(pattern.split('').reverse().join(''))) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function isCommonPattern(password) {
+    const commonPatterns = [
+      /^123/, /password/i, /qwerty/i, /abc123/i,
+      /admin/i, /letmein/i, /welcome/i, /monkey/i,
+      /123456/, /654321/, /qwerty123/i, /admin123/i,
+      /football/i, /baseball/i, /dragon/i, /master/i,
+      /hello/i, /shadow/i, /superman/i, /batman/i,
+      /trustno1/i, /sunshine/i, /iloveyou/i,
+      /\d{6,}/, // 6 o más números seguidos
+      /(.)\1{2,}/, // 3 o más caracteres repetidos
+      /password\d*/i, // password seguido de números
+      /abc\d*/i, // abc seguido de números
+      /qwe\d*/i, // qwe seguido de números
+      /111/, /000/, /abc/, /xyz/
+    ];
+    return commonPatterns.some(pattern => pattern.test(password));
+  }
+
+  function getStrengthLabel(strength) {
+    if (strength < 20) return ['Muy débil', '#ff4444'];
+    if (strength < 40) return ['Débil', '#ffbb33'];
+    if (strength < 60) return ['Moderada', '#ffbb33'];
+    if (strength < 80) return ['Fuerte', '#00C851'];
+    return ['Muy fuerte', '#00C851'];
+  }
+
+  function analyzePassword(password) {
+    const strength = calculatePasswordStrength(password);
+    const [label, color] = getStrengthLabel(strength);
+    
+    strengthBar.style.width = `${strength}%`;
+    strengthBar.style.backgroundColor = color;
+    strengthLabel.textContent = label;
+    strengthLabel.style.color = color;
+
+    analysisContainer.style.display = 'block';
+    checksGrid.innerHTML = '';
+
+    const checks = [
+      {
+        name: 'Longitud (mín. 12)',
+        passed: password.length >= 12,
+        icon: '📏'
+      },
+      {
+        name: 'Mayúsculas',
+        passed: /[A-Z]/.test(password),
+        icon: '🔠'
+      },
+      {
+        name: 'Minúsculas',
+        passed: /[a-z]/.test(password),
+        icon: '🔡'
+      },
+      {
+        name: 'Números (mín. 2)',
+        passed: (password.match(/\d/g) || []).length >= 2,
+        icon: '🔢'
+      },
+      {
+        name: 'Caracteres especiales (mín. 2)',
+        passed: (password.match(/[^A-Za-z0-9]/g) || []).length >= 2,
+        icon: '💫'
+      },
+      {
+        name: 'Sin patrones comunes',
+        passed: !isCommonPattern(password),
+        icon: '🎯'
+      },
+      {
+        name: 'Sin secuencias',
+        passed: !hasSequentialPatterns(password),
+        icon: '🔄'
+      },
+      {
+        name: 'Sin repeticiones',
+        passed: !/(.)\1{2,}/.test(password),
+        icon: '🔁'
+      }
+    ];
+
+    checks.forEach(check => {
+      const checkElement = document.createElement('div');
+      checkElement.className = `check-item ${check.passed ? 'passed' : 'failed'}`;
+      checkElement.innerHTML = `
+        <span>${check.icon}</span>
+        <span>${check.name}</span>
+      `;
+      checksGrid.appendChild(checkElement);
+    });
+
+    suggestions.innerHTML = '';
+    const suggestionsList = [];
+    
+    if (password.length < 12) {
+      suggestionsList.push('Aumenta la longitud a al menos 12 caracteres');
+    }
+    if (!/[A-Z]/.test(password)) {
+      suggestionsList.push('Agrega letras mayúsculas');
+    }
+    if (!/[a-z]/.test(password)) {
+      suggestionsList.push('Agrega letras minúsculas');
+    }
+    if ((password.match(/\d/g) || []).length < 2) {
+      suggestionsList.push('Agrega al menos 2 números');
+    }
+    if ((password.match(/[^A-Za-z0-9]/g) || []).length < 2) {
+      suggestionsList.push('Agrega al menos 2 caracteres especiales (!@#$%^&*)');
+    }
+    if (isCommonPattern(password)) {
+      suggestionsList.push('Evita palabras y patrones comunes');
+    }
+    if (hasSequentialPatterns(password)) {
+      suggestionsList.push('Evita secuencias de letras o números (abc, 123, qwerty)');
+    }
+    if (/(.)\1{2,}/.test(password)) {
+      suggestionsList.push('Evita caracteres repetidos consecutivamente');
+    }
+    
+    if (suggestionsList.length === 0) {
+      suggestionsList.push('¡Excelente! Tu contraseña cumple con todos los criterios de seguridad.');
+    }
+
+    suggestionsList.forEach(suggestion => {
+      const li = document.createElement('li');
+      li.textContent = suggestion;
+      suggestions.appendChild(li);
+    });
+  }
+
+  passwordInput.addEventListener('input', (e) => {
+    analyzePassword(e.target.value);
+  });
+</script>
+
+</body>
+</html>

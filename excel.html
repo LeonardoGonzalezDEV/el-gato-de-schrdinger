@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel/CSV</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jschardet/2.3.0/jschardet.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      color: white;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    h1 img {
+      width: 40px;
+      height: auto;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .menu a {
+      padding: 1rem 2rem;
+      text-decoration: none;
+      color: white;
+      border-bottom: 2px solid transparent;
+      transition: background-color 0.3s;
+    }
+    .menu a.active {
+      border-bottom: 2px solid #4caf50;
+    }
+    .menu-item {
+      position: relative;
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #2a2a2a;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      padding: 0.5rem 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+    .menu-item:hover .submenu {
+      display: block;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: white;
+      text-decoration: none;
+      border-bottom: none;
+      transition: background-color 0.3s;
+    }
+    .submenu a:hover {
+      background-color: #383838;
+    }
+    .conversion-section {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .conversion-section > div {
+      flex: 1;
+      background-color: #2a2a2a;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    input[type="file"] {
+      display: block;
+      margin: 1rem 0;
+      padding: 0.5rem;
+      background-color: #444444;
+      color: #ffffff;
+      border: 2px solid #555555;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    input[type="file"]::-webkit-file-upload-button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    input[type="file"]::-webkit-file-upload-button:hover {
+      background-color: #45a049;
+    }
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      background-color: #444444;
+      color: white;
+      border: 2px solid #555555;
+      border-radius: 5px;
+    }
+    .convert-btn {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      margin-top: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    .convert-btn:hover {
+      background-color: #45a049;
+    }
+    .convert-btn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+    .file-info {
+      margin: 1rem 0;
+      padding: 1rem;
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <img src="img/logo.png" alt="Logo"> El Gato de Schrödinger
+    </h1> 
+    <div class="menu">
+      <div class="menu-item">
+        <a href="#">Audio</a>
+        <div class="submenu">
+          <a href="conversionAudio.html">Conversión</a>
+          <a href="compressionAudio.html">Compresión</a>
+          <a href="TextoToAudio.html">Texto a Audio</a>
+          <a href="RecortarAudio.html">Recortar</a>
+          
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Imagen</a>
+        <div class="submenu">
+          <a href="conversionImagen.html">Conversión</a>
+          <a href="compressionImagen.html">Compresión</a>
+          <a href="resizeImagen.html">Redimensionar</a>
+          <a href="editImage.html">Editar</a>
+          <a href="Icon.html">Icono</a>
+          <a href="paleta_img.html">Detectar Colores</a>
+          <a href="quitar_fondo.html">Borrar Fondo</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Video</a>
+        <div class="submenu">
+          <a href="conversionVideo.html">Conversión</a>
+          <a href="SepararAudio.html">Separar Audio</a>
+          <a href="RecortarVideo.html">Recortar</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#">Qr</a>
+        <div class="submenu">
+          <a href="GenerarQr.html">Crear</a>
+          <a href="LeerQr.html">Leer</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" class="active">Archivos</a>
+        <div class="submenu">
+          <a href="pdfunion.html">Unir PDF</a>
+          <a href="pdfsepar.html">Separar PDF</a>
+          <a href="deletepdf.html">Borrar PDF</a>
+          <a href="textotoPdf.html">Texto a PDF</a>
+          <a href="excel.html">Excel/CSV</a>
+        </div>
+      </div>
+      
+      <div class="menu-item">
+        <a href="#" >Herramientas</a>
+        <div class="submenu">
+                <a href="speedtest.html">Test de Internet</a>
+                <a href="resumidor.html">Resumidor de Textos</a>
+                <a href="GenerarPass.html">Generar Contraseña</a>
+                <a href="VerifyPass.html">Verificar Contraseña</a>
+                <a href="clicktest.html">Test de Mouse</a>
+                <a href="Testeclado.html">Test de Teclado</a>
+                <a href="divisas.html">Divisas</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#" >Aleatorio</a>
+        <div class="submenu">
+                <a href="cara_cruz.html">Cara Cruz</a>
+                <a href="ruleta.html">Ruleta</a>
+                <a href="dado.html">Dado</a>
+            </div>
+      </div>
+      <div class="menu-item">
+        <a href="#">Biblioteca</a>
+        <div class="submenu">
+                <a href="wiki.html">Wikipedia</a>
+                <a href="github.html">Github</a>
+                <a href="reddit.html">Reddit</a>
+            </div>
+      </div>
+    </div>
+
+    <div class="conversion-section">
+      <div>
+        <h2>Seleccionar Excel/CSV</h2>
+        <input type="file" id="input-file" accept=".xlsx,.xls,.csv">
+        <select id="input-encoding">
+          <option value="">Detectar codificación automáticamente</option>
+          <option value="UTF-8">UTF-8</option>
+          <option value="ISO-8859-1">ISO-8859-1 (Latin-1)</option>
+          <option value="Windows-1252">Windows-1252</option>
+        </select>
+        <div class="file-info" id="input-file-info">
+          No se ha seleccionado ningún archivo
+        </div>
+      </div>
+      
+      <div>
+        <h2>Salida</h2>
+        <select id="output-format">
+          <option value="csv">CSV</option>
+          <option value="xlsx">Excel (XLSX)</option>
+        </select>
+        <select id="output-encoding">
+          <option value="UTF-8">UTF-8</option>
+          <option value="ISO-8859-1">ISO-8859-1 (Latin-1)</option>
+          <option value="Windows-1252">Windows-1252</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="convert-btn" class="convert-btn" disabled>Convertir</button>
+  </div>
+
+  <script>
+    const inputFile = document.getElementById('input-file');
+    const inputFileInfo = document.getElementById('input-file-info');
+    const outputFormat = document.getElementById('output-format');
+    const inputEncoding = document.getElementById('input-encoding');
+    const outputEncoding = document.getElementById('output-encoding');
+    const convertBtn = document.getElementById('convert-btn');
+
+    let selectedFile = null;
+
+    inputFile.addEventListener('change', (e) => {
+      selectedFile = e.target.files[0];
+      if (selectedFile) {
+        const size = (selectedFile.size / 1024 / 1024).toFixed(2);
+        inputFileInfo.textContent = `Archivo seleccionado: ${selectedFile.name} (${size} MB)`;
+        convertBtn.disabled = false;
+      }
+    });
+
+    convertBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      try {
+        const arrayBuffer = await selectedFile.arrayBuffer();
+        let workbook;
+        let encoding = inputEncoding.value;
+
+        // Detect encoding if not specified
+        if (!encoding) {
+          const bufferView = new Uint8Array(arrayBuffer);
+          const detected = jschardet.detect(bufferView);
+          encoding = detected.encoding || 'UTF-8';
+        }
+
+        // Parse input file
+        if (selectedFile.name.endsWith('.csv')) {
+          // CSV to Excel/CSV
+          const text = new TextDecoder(encoding).decode(arrayBuffer);
+          workbook = XLSX.read(text, { type: 'string' });
+        } else {
+          // Excel to Excel/CSV
+          workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        }
+
+        let outputData;
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        if (outputFormat.value === 'csv') {
+          // Convert to CSV
+          outputData = XLSX.utils.sheet_to_csv(worksheet);
+          const blob = new Blob([new TextEncoder().encode(outputData)], { type: 'text/csv;charset=utf-8' });
+          downloadFile(blob, `converted_${selectedFile.name.replace(/\.[^/.]+$/, '.csv')}`);
+        } else {
+          // Convert to XLSX
+          const newWorkbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(newWorkbook, worksheet, 'Sheet1');
+          const outputBuffer = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' });
+          const blob = new Blob([outputBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          downloadFile(blob, `converted_${selectedFile.name.replace(/\.[^/.]+$/, '.xlsx')}`);
+        }
+      } catch (error) {
+        console.error('Error al convertir el archivo:', error);
+        alert('Error al convertir el archivo. Verifique el archivo y vuelva a intentarlo.');
+      }
+    });
+
+    function downloadFile(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
